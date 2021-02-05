@@ -64,6 +64,14 @@ label.handleCustomTap(for: customType) { element in
 }
 ```
 
+## Generic label tap
+
+```swift
+handleGenericTap {
+    print("Success. You just tapped the label.")
+}
+```
+
 ## Enable/disable highlighting
 
 By default, an ActiveLabel instance has the following configuration

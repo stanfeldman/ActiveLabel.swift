@@ -91,6 +91,10 @@ typealias ElementTuple = (range: NSRange, element: ActiveElement, type: ActiveTy
         emailTapHandler = handler
     }
     
+    open func handleGenericTap(_ handler: @escaping () -> ()) {
+        genericTapHandler = handler
+    }
+    
     open func removeHandle(for type: ActiveType) {
         switch type {
         case .hashtag:
@@ -215,7 +219,15 @@ typealias ElementTuple = (range: NSRange, element: ActiveElement, type: ActiveTy
                 selectedElement = nil
             }
         case .ended, .regionExited:
-            guard let selectedElement = selectedElement else { return avoidSuperCall }
+            guard let selectedElement = selectedElement else {
+                // call a generic tap handler if set or exit
+                if let genericTapHandler = genericTapHandler {
+                    genericTapHandler()
+                    return true
+                } else {
+                    return avoidSuperCall
+                }
+            }
             
             switch selectedElement.element {
             case .mention(let userHandle): didTapMention(userHandle)
@@ -252,6 +264,7 @@ typealias ElementTuple = (range: NSRange, element: ActiveElement, type: ActiveTy
     internal var urlTapHandler: ((URL) -> ())?
     internal var emailTapHandler: ((String) -> ())?
     internal var customTapHandlers: [ActiveType : ((String) -> ())] = [:]
+    internal var genericTapHandler: (() -> ())?
     
     fileprivate var mentionFilterPredicate: ((String) -> Bool)?
     fileprivate var hashtagFilterPredicate: ((String) -> Bool)?
